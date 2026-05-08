@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  TENANT
+}
+
+enum RoomStatus {
+  VACANT
+  OCCUPIED
+  RESERVED
+  MAINTENANCE
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+enum InvoiceType {
+  RENT
+  WATER
+  PENALTY
+  OTHER
+}
+
+enum NoticeType {
+  VACATION
+  MAINTENANCE
+}
+
+enum NoticeStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  role          Role           @default(TENANT)
+  name          String?
+  phone         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  tenantProfile TenantProfile?
+  announcements Announcement[]
+}
+
+model TenantProfile {
+  id           String    @id @default(uuid())
+  user         User      @relation(fields: [userId], references: [id])
+  userId       String    @unique
+  unitId       String?   @unique
+  room         Room?     @relation(fields: [unitId], references: [id])
+  moveInDate   DateTime?
+  invoices     Invoice[]
+  notices      Notice[]
+}
+
+model Room {
+  id         String         @id
+  floor      String
+  price      Float
+  isCorner   Boolean        @default(false)
+  status     RoomStatus     @default(VACANT)
+  tenant     TenantProfile?
+  bookings   Booking[]
+}
+
+model Booking {
+  id              String   @id @default(uuid())
+  applicantName   String
+  phone           String
+  email           String
+  idDocumentUrl   String?
+  status          String   @default("pending") // pending, approved, rejected
+  roomId          String
+  room            Room     @relation(fields: [roomId], references: [id])
+  date            DateTime @default(now())
+}
+
+model Invoice {
+  id          String        @id @default(uuid())
+  type        InvoiceType   @default(RENT)
+  amount      Float
+  dueDate     DateTime
+  status      InvoiceStatus @default(PENDING)
+  tenantId    String
+  tenant      TenantProfile @relation(fields: [tenantId], references: [id])
+  createdAt   DateTime      @default(now())
+  payments    Payment[]
+}
+
+model Payment {
+  id         String   @id @default(uuid())
+  amount     Float
+  date       DateTime @default(now())
+  receiptUrl String?
+  invoiceId  String
+  invoice    Invoice  @relation(fields: [invoiceId], references: [id])
+}
+
+model Notice {
+  id        String       @id @default(uuid())
+  type      NoticeType
+  content   String
+  status    NoticeStatus @default(PENDING)
+  tenantId  String
+  tenant    TenantProfile @relation(fields: [tenantId], references: [id])
+  date      DateTime     @default(now())
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  content   String
+  date      DateTime @default(now())
+  adminId   String
+  admin     User     @relation(fields: [adminId], references: [id])
+}

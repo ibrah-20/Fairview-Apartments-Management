@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --color-maroon: #6B1B2A;
+  --color-maroon-light: #8B2535;
+  --color-maroon-dark: #4A1019;
+  --color-silver: #C0C0C8;
+  --color-grey: #6B7280;
+  --color-grey-light: #F3F4F6;
+  --color-grey-dark: #374151;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Outfit', system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-grey-light text-grey-dark antialiased;
+    font-family: var(--font-sans);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+  
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-lg border border-white/30 shadow-lg rounded-2xl;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-maroon to-maroon-light;
+  }
+}
+
+/* Custom Animations */
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s infinite ease-in-out;
+}
