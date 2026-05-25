@@ -1,16 +1,32 @@
-# React + Vite
+# City Lake Enterprises Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+City Lake Enterprises is a professional ERP/business management platform that manages two main business divisions under one unified system:
+1. **Fairview Apartments**: Apartment rental and tenant management.
+2. **City Lake Water Services**: Water purification and digital POS selling business located on the ground floor.
 
-Currently, two official plugins are available:
+## System Features
+- **Global Theme Persistence**: Dark/Light mode supported natively across all interfaces using standard tailwind variants.
+- **Enterprise Dashboards**: Role-based access control rendering vastly different portals for Admins, Property Managers, Tenants, and Water Staff.
+- **Real-Time Digital POS**: A robust Point of Sale system built exclusively for the Water Station to auto-deduct inventory, track payment methods (Cash, M-Pesa, etc.), and generate exportable End-of-Day `.csv` reports.
+- **Automated Delivery Logic**: Online water orders are automatically evaluated for free-delivery eligibility based on exact time windows and volume rules.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Testing Logins / Portals
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The database has been seeded with standard mock accounts so you can test every specific portal and dashboard constraint. All accounts share the same password.
 
-## Expanding the ESLint configuration
+**Universal Password for all accounts**: `admin123`
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Role | Email Address | Access Level & Portal |
+| :--- | :--- | :--- |
+| **Super Admin** | `admin@citylake.com` | Has access to EVERYTHING. Will route to the Super Admin Dashboard with complete system control. |
+| **Water Staff** | `water@citylake.com` | Restricted to the Water Station Portal. Has access to the Digital POS, Sales Ledger, Online Orders queue, and EOD Reports. Cannot view apartment management. |
+| **Property Manager** | `manager@citylake.com` | Restricted to the Fairview Apartments Portal. Has access to room statuses, tenant profiles, bookings, and building analytics. |
+| **Tenant** | `tenant@citylake.com` | Restricted to the Tenant Portal. Used to view personal rent invoices, maintenance notices, and building announcements. |
+
+### How to use:
+1. Ensure your backend server is running.
+2. Seed the database if you haven't already: `cd server && npx prisma db seed`
+3. Navigate to `http://localhost:5173/login`
+4. Enter any of the emails above to be automatically routed to their respective enterprise dashboard!

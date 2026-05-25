@@ -4,18 +4,36 @@
   --color-maroon: #6B1B2A;
   --color-maroon-light: #8B2535;
   --color-maroon-dark: #4A1019;
+  --color-maroon-muted: #f9eef0;
+  
   --color-silver: #C0C0C8;
-  --color-grey: #6B7280;
-  --color-grey-light: #F3F4F6;
-  --color-grey-dark: #374151;
+  --color-silver-light: #E2E2E5;
+  --color-silver-dark: #8C8C94;
+  
+  --color-surface-light: #FFFFFF;
+  --color-surface-dark: #1E1E24;
+  --color-surface-hover-dark: #2A2A35;
+  
+  --color-background-light: #F4F4F9;
+  --color-background-dark: #121217;
+
+  --color-text-light: #1A1A24;
+  --color-text-muted-light: #64748b;
+  --color-text-dark: #E2E2E5;
+  --color-text-muted-dark: #94A3B8;
+
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-heading: 'Outfit', system-ui, sans-serif;
 }
 
 @layer base {
   body {
-    @apply bg-grey-light text-grey-dark antialiased;
+    @apply bg-background-light text-text-light antialiased transition-colors duration-300;
     font-family: var(--font-sans);
+  }
+  
+  body.dark {
+    @apply bg-background-dark text-text-dark;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -24,25 +42,41 @@
 }
 
 @layer utilities {
-  .glass {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
+  .enterprise-card {
+    @apply bg-surface-light border border-silver-light shadow-sm rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md;
   }
   
-  .glass-card {
-    @apply bg-white/80 backdrop-blur-lg border border-white/30 shadow-lg rounded-2xl;
+  .dark .enterprise-card {
+    @apply bg-surface-dark border-surface-hover-dark shadow-none hover:bg-surface-hover-dark;
   }
 
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-maroon to-maroon-light;
+  .enterprise-sidebar {
+    @apply bg-surface-light border-r border-silver-light transition-colors duration-300;
+  }
+
+  .dark .enterprise-sidebar {
+    @apply bg-surface-dark border-surface-hover-dark;
+  }
+
+  .enterprise-topbar {
+    @apply bg-surface-light/80 backdrop-blur-md border-b border-silver-light transition-colors duration-300;
+  }
+
+  .dark .enterprise-topbar {
+    @apply bg-surface-dark/80 border-surface-hover-dark;
   }
 }
 
-/* Custom Animations */
-@keyframes bounce-subtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-.animate-bounce-subtle {
-  animation: bounce-subtle 2s infinite ease-in-out;
+@layer components {
+  .btn-primary {
+    @apply bg-maroon text-white px-4 py-2 rounded-lg font-medium hover:bg-maroon-dark transition-colors focus:ring-2 focus:ring-maroon-light focus:outline-none disabled:opacity-50;
+  }
+  
+  .btn-secondary {
+    @apply bg-silver text-text-light px-4 py-2 rounded-lg font-medium hover:bg-silver-dark transition-colors focus:ring-2 focus:ring-silver focus:outline-none disabled:opacity-50;
+  }
+  
+  .dark .btn-secondary {
+    @apply bg-surface-hover-dark text-text-dark hover:bg-surface-light/10;
+  }
 }

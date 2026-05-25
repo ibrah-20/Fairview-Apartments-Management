@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,66 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  SUPER_ADMIN
-  ADMIN
-  TENANT
-}
 
-enum RoomStatus {
-  VACANT
-  OCCUPIED
-  RESERVED
-  MAINTENANCE
-}
-
-enum InvoiceStatus {
-  PENDING
-  PAID
-  OVERDUE
-}
-
-enum InvoiceType {
-  RENT
-  WATER
-  PENALTY
-  OTHER
-}
-
-enum NoticeType {
-  VACATION
-  MAINTENANCE
-}
-
-enum NoticeStatus {
-  PENDING
-  IN_PROGRESS
-  RESOLVED
-  CLOSED
-}
 
 model User {
-  id            String         @id @default(uuid())
-  email         String         @unique
+  id            String             @id @default(uuid())
+  email         String             @unique
   password      String
-  role          Role           @default(TENANT)
+  role          String             @default("TENANT")
   name          String?
   phone         String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
   tenantProfile TenantProfile?
   announcements Announcement[]
+  waterSales    WaterTransaction[]
+  activityLogs  ActivityLog[]
 }
 
 model TenantProfile {
   id           String    @id @default(uuid())
-  user         User      @relation(fields: [userId], references: [id])
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String    @unique
   unitId       String?   @unique
   room         Room?     @relation(fields: [unitId], references: [id])
+  idDocument   String?
   moveInDate   DateTime?
+  moveOutDate  DateTime?
   invoices     Invoice[]
   notices      Notice[]
+  garbageFee   Float     @default(0)
 }
 
 model Room {
@@ -77,7 +43,7 @@ model Room {
   floor      String
   price      Float
   isCorner   Boolean        @default(false)
-  status     RoomStatus     @default(VACANT)
+  status     String         @default("VACANT")
   tenant     TenantProfile?
   bookings   Booking[]
 }
@@ -88,7 +54,7 @@ model Booking {
   phone           String
   email           String
   idDocumentUrl   String?
-  status          String   @default("pending") // pending, approved, rejected
+  status          String   @default("pending")
   roomId          String
   room            Room     @relation(fields: [roomId], references: [id])
   date            DateTime @default(now())
@@ -96,10 +62,10 @@ model Booking {
 
 model Invoice {
   id          String        @id @default(uuid())
-  type        InvoiceType   @default(RENT)
+  type        String        @default("RENT")
   amount      Float
   dueDate     DateTime
-  status      InvoiceStatus @default(PENDING)
+  status      String        @default("PENDING")
   tenantId    String
   tenant      TenantProfile @relation(fields: [tenantId], references: [id])
   createdAt   DateTime      @default(now())
@@ -116,19 +82,93 @@ model Payment {
 }
 
 model Notice {
-  id        String       @id @default(uuid())
-  type      NoticeType
+  id        String        @id @default(uuid())
+  type      String
   content   String
-  status    NoticeStatus @default(PENDING)
+  status    String        @default("PENDING")
   tenantId  String
   tenant    TenantProfile @relation(fields: [tenantId], references: [id])
-  date      DateTime     @default(now())
+  date      DateTime      @default(now())
 }
 
 model Announcement {
   id        String   @id @default(uuid())
+  title     String?
   content   String
   date      DateTime @default(now())
   adminId   String
   admin     User     @relation(fields: [adminId], references: [id])
+}
+
+model WaterCustomer {
+  id           String             @id @default(uuid())
+  name         String
+  phone        String?
+  email        String?
+  transactions WaterTransaction[]
+  createdAt    DateTime           @default(now())
+}
+
+model WaterTransaction {
+  id            String         @id @default(uuid())
+  amount        Float          
+  quantity      Float          
+  litersPerUnit Int            @default(20)
+  date          DateTime       @default(now())
+  staffId       String         
+  staff         User           @relation(fields: [staffId], references: [id])
+  customerId    String?
+  customer      WaterCustomer? @relation(fields: [customerId], references: [id])
+  customerName  String?
+  type          String         @default("REFILL") 
+  orderType     String         @default("PICKUP") // PICKUP or DELIVERY
+  paymentMethod String         @default("CASH") // CASH, MPESA, BANK, PENDING
+  mpesaRef      String?
+  notes         String?
+}
+
+model WaterDailyReport {
+  id              String   @id @default(uuid())
+  date            DateTime @default(now())
+  totalRevenue    Float
+  totalLitersSold Float
+  totalOrders     Int
+  freeDeliveries  Int
+  mostSoldSize    Int
+  createdAt       DateTime @default(now())
+}
+
+model WaterInventory {
+  id          String   @id @default(uuid())
+  type        String   @unique
+  quantity    Float
+  updatedAt   DateTime @updatedAt
+}
+
+model SystemConfig {
+  key   String @id
+  value String 
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+}
+
+model WaterOrder {
+  id              String   @id @default(uuid())
+  customerName    String
+  phone           String
+  location        String
+  quantity        Int
+  litersPerUnit   Int
+  totalPrice      Float
+  isFreeDelivery  Boolean  @default(false)
+  status          String   @default("PENDING") // PENDING, CONFIRMED, DELIVERED, CANCELLED
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

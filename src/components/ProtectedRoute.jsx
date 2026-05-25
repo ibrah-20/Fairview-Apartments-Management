@@ -1,14 +1,14 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import useStore from '../store/useStore';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user, loading } = useAuth();
+  const { user, loading } = useStore();
   const location = useLocation();
 
   if (loading) return (
-    <div className="flex items-center justify-center min-h-screen bg-[#F9FAFB]">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#6B1B2A]"></div>
+    <div className="flex items-center justify-center min-h-screen bg-background-light dark:bg-background-dark">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-maroon"></div>
     </div>
   );
 
@@ -17,7 +17,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/unauthorized" replace />;
   }
 
   return children;
