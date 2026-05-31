@@ -7,7 +7,7 @@
     "dev": "vite",
     "server": "cd server && npm run dev",
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
-    "build": "vite build",
+    "build": "prisma db push --schema=server/prisma/schema.prisma --accept-data-loss && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "postinstall": "prisma generate --schema=server/prisma/schema.prisma"
