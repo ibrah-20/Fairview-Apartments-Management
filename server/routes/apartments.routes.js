@@ -5,6 +5,30 @@ const { authenticateToken, authorizeRole } = require('../middleware/auth');
 const router = express.Router();
 const prisma = new PrismaClient();
 
+const bcrypt = require('bcrypt');
+
+router.get('/seed', async (req, res) => {
+  try {
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    await prisma.user.upsert({ where: { email: 'admin@citylake.com' }, update: {}, create: { email: 'admin@citylake.com', password: hashedPassword, name: 'Super Admin', role: 'SUPER_ADMIN' } });
+    await prisma.user.upsert({ where: { email: 'manager@citylake.com' }, update: {}, create: { email: 'manager@citylake.com', password: hashedPassword, name: 'Property Manager', role: 'APARTMENT_MANAGER' } });
+    
+    const floors = [ { prefix: 'G', label: 'Ground Floor' }, { prefix: 'A', label: 'First Floor' }, { prefix: 'B', label: 'Second Floor' }, { prefix: 'C', label: 'Third Floor' }, { prefix: 'D', label: 'Fourth Floor' }, { prefix: 'E', label: 'Fifth Floor' } ];
+    for (const floor of floors) {
+      for (let i = 1; i <= 15; i++) {
+        const isCorner = i === 1 || i === 8 || i === 15;
+        await prisma.room.upsert({ where: { id: `${floor.prefix}${i}` }, update: {}, create: { id: `${floor.prefix}${i}`, floor: floor.label, price: isCorner ? 6500 : 7000, isCorner, status: 'VACANT' } });
+      }
+    }
+    
+    await prisma.waterInventory.upsert({ where: { type: 'PURIFIED_WATER_LITERS' }, update: {}, create: { type: 'PURIFIED_WATER_LITERS', quantity: 5000 } });
+    res.json({ message: 'Database successfully seeded!' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.get('/rooms', async (req, res) => {
   try {
     const rooms = await prisma.room.findMany({
@@ -65,7 +89,8 @@ router.post('/bookings', async (req, res) => {
     
     res.status(201).json(booking);
   } catch (error) {
-    res.status(500).json({ message: 'Error creating booking.' });
+    console.error("Booking Error:", error);
+    res.status(500).json({ message: error.message || 'Error creating booking.' });
   }
 });
 
