@@ -47,7 +47,7 @@ const Booking = () => {
     
     setIsSubmitting(true);
     try {
-      await api.post('/bookings', {
+      await api.post('/apartments/bookings', {
         applicantName: form.name,
         phone: form.phone,
         email: form.email,
