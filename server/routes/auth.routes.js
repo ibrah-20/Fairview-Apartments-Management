@@ -39,9 +39,7 @@ router.post('/register-admin', async (req, res) => {
   }
 });
 
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
+const handleLogin = async (email, password, allowedRoles, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { email },
@@ -50,6 +48,10 @@ router.post('/login', async (req, res) => {
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Invalid email or password.' });
+    }
+
+    if (allowedRoles && !allowedRoles.includes(user.role)) {
+      return res.status(403).json({ message: 'Invalid portal for your account role. Please select the correct tab.' });
     }
 
     const token = jwt.sign(
@@ -73,6 +75,22 @@ router.post('/login', async (req, res) => {
     console.error('LOGIN EXCEPTION:', error);
     res.status(500).json({ message: 'Login error.', error: error.message });
   }
+};
+
+router.post('/login', async (req, res) => {
+  await handleLogin(req.body.email, req.body.password, null, res);
+});
+
+router.post('/admin-login', async (req, res) => {
+  await handleLogin(req.body.email, req.body.password, ['SUPER_ADMIN', 'ADMIN'], res);
+});
+
+router.post('/staff-login', async (req, res) => {
+  await handleLogin(req.body.email, req.body.password, ['WATER_STAFF', 'APARTMENT_MANAGER'], res);
+});
+
+router.post('/tenant-login', async (req, res) => {
+  await handleLogin(req.body.email, req.body.password, ['TENANT'], res);
 });
 
 module.exports = router;

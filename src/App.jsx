@@ -21,14 +21,10 @@ import ApartmentManagerDashboard from './pages/dashboards/ApartmentManagerDashbo
 import WaterStaffDashboard from './pages/dashboards/WaterStaffDashboard';
 import TenantPortal from './pages/dashboards/TenantPortal';
 
-const PlaceholderPage = ({ title }) => (
-  <div className="flex h-full min-h-[60vh] items-center justify-center bg-surface-light dark:bg-surface-dark rounded-xl border border-silver-light dark:border-surface-hover-dark">
-    <div className="text-center">
-      <h2 className="text-2xl font-bold text-text-light dark:text-text-dark mb-2">{title}</h2>
-      <p className="text-text-muted-light dark:text-text-muted-dark">This module is currently under development.</p>
-    </div>
-  </div>
-);
+import { AdminTenants, AdminRooms, AdminWater, AdminPayments, AdminReports, AdminAnnouncements, AdminSettings, WaterInventory, WaterCustomers, WaterReports, WaterProfile, TenantPayments, TenantInvoices, TenantNotices, TenantMaintenance, TenantProfile } from './pages/dashboards/DashboardComponents';
+import WaterSales from './pages/dashboards/WaterSales';
+
+// Placeholders removed
 
 function App() {
   const { initAuth, initTheme } = useStore();
@@ -65,13 +61,13 @@ function App() {
         }>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<SuperAdminDashboard />} />
-          <Route path="tenants" element={<PlaceholderPage title="Tenant Management" />} />
-          <Route path="rooms" element={<PlaceholderPage title="Room Management" />} />
-          <Route path="water" element={<PlaceholderPage title="Water Business Overview" />} />
-          <Route path="payments" element={<PlaceholderPage title="Payments & Invoices" />} />
-          <Route path="reports" element={<PlaceholderPage title="System Reports" />} />
-          <Route path="announcements" element={<PlaceholderPage title="Announcements" />} />
-          <Route path="settings" element={<PlaceholderPage title="System Settings" />} />
+          <Route path="tenants" element={<AdminTenants />} />
+          <Route path="rooms" element={<AdminRooms />} />
+          <Route path="water" element={<AdminWater />} />
+          <Route path="payments" element={<AdminPayments />} />
+          <Route path="reports" element={<AdminReports />} />
+          <Route path="announcements" element={<AdminAnnouncements />} />
+          <Route path="settings" element={<AdminSettings />} />
           <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Route>
 
@@ -83,8 +79,8 @@ function App() {
         }>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<ApartmentManagerDashboard />} />
-          <Route path="tenants" element={<PlaceholderPage title="Tenant Directory" />} />
-          <Route path="maintenance" element={<PlaceholderPage title="Maintenance Requests" />} />
+          <Route path="tenants" element={<AdminTenants />} />
+          <Route path="maintenance" element={<TenantMaintenance />} />
           <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Route>
 
@@ -96,11 +92,11 @@ function App() {
         }>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<WaterStaffDashboard />} />
-          <Route path="sales" element={<PlaceholderPage title="Water Sales" />} />
-          <Route path="inventory" element={<PlaceholderPage title="Inventory Management" />} />
-          <Route path="customers" element={<PlaceholderPage title="Customer Directory" />} />
-          <Route path="reports" element={<PlaceholderPage title="Sales Reports" />} />
-          <Route path="profile" element={<PlaceholderPage title="My Profile" />} />
+          <Route path="sales" element={<WaterSales />} />
+          <Route path="inventory" element={<WaterInventory />} />
+          <Route path="customers" element={<WaterCustomers />} />
+          <Route path="reports" element={<WaterReports />} />
+          <Route path="profile" element={<WaterProfile />} />
           <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Route>
 
@@ -112,11 +108,11 @@ function App() {
         }>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<TenantPortal />} />
-          <Route path="payments" element={<PlaceholderPage title="My Payments" />} />
-          <Route path="invoices" element={<PlaceholderPage title="My Invoices" />} />
-          <Route path="notices" element={<PlaceholderPage title="Community Notices" />} />
-          <Route path="maintenance" element={<PlaceholderPage title="Maintenance Requests" />} />
-          <Route path="profile" element={<PlaceholderPage title="My Profile" />} />
+          <Route path="payments" element={<TenantPayments />} />
+          <Route path="invoices" element={<TenantInvoices />} />
+          <Route path="notices" element={<TenantNotices />} />
+          <Route path="maintenance" element={<TenantMaintenance />} />
+          <Route path="profile" element={<TenantProfile />} />
           <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Route>
 

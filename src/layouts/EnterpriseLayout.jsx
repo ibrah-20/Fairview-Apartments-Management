@@ -9,23 +9,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import useStore from '../store/useStore';
 
 const EnterpriseLayout = () => {
-  const { user, logout } = useStore();
+  const { user, logout, theme, toggleTheme } = useStore();
   const role = user?.role || 'TENANT';
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const isDarkMode = theme === 'dark';
   const navigate = useNavigate();
 
-  // Basic dark mode toggle
-  useEffect(() => {
-    const root = window.document.documentElement;
-    if (isDarkMode) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [isDarkMode]);
-
-  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+  const toggleDarkMode = () => toggleTheme();
   
   const handleLogout = () => {
     logout();

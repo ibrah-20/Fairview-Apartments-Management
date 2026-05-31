@@ -43,19 +43,14 @@ const useStore = create((set) => ({
 
   login: async (email, password, activePortal) => {
     try {
-      const response = await api.post('/auth/login', { email, password });
-      const { token, user } = response.data;
-      
-      if (activePortal) {
-        let isAllowed = false;
-        if (activePortal === 'TENANT' && user.role === 'TENANT') isAllowed = true;
-        if (activePortal === 'STAFF' && (user.role === 'WATER_STAFF' || user.role === 'APARTMENT_MANAGER')) isAllowed = true;
-        if (activePortal === 'SUPER_ADMIN' && (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN')) isAllowed = true;
+      let endpoint = '/auth/login';
+      if (activePortal === 'TENANT') endpoint = '/auth/tenant-login';
+      else if (activePortal === 'STAFF') endpoint = '/auth/staff-login';
+      else if (activePortal === 'SUPER_ADMIN') endpoint = '/auth/admin-login';
 
-        if (!isAllowed) {
-          throw new Error('Invalid portal for your account role. Please select the correct tab.');
-        }
-      }
+      const response = await api.post(endpoint, { email, password });
+      const { token, user } = response.data;
+
 
       localStorage.setItem('fairview_token', token);
       localStorage.setItem('fairview_user', JSON.stringify(user));

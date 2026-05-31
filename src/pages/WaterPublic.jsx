@@ -68,9 +68,7 @@ const WaterPublic = () => {
       toast.success("Order Placed Successfully! We are on our way.");
       setForm({ customerName: '', phone: '', location: '', litersPerUnit: 20, quantity: 1 });
     } catch (error) {
-      // Graceful fallback for mock
-      toast.success("Order Placed Successfully! (Mocked)");
-      setForm({ customerName: '', phone: '', location: '', litersPerUnit: 20, quantity: 1 });
+      toast.error(error.response?.data?.message || "Failed to place order. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

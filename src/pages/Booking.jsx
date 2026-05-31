@@ -57,8 +57,7 @@ const Booking = () => {
       toast.success("Booking Request Submitted! We'll contact you soon.");
       navigate('/');
     } catch (error) {
-      toast.success("Booking Request Submitted! (Mocked)");
-      navigate('/');
+      toast.error(error.response?.data?.message || "Failed to submit booking. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

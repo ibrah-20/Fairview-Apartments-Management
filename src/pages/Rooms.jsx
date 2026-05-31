@@ -16,7 +16,7 @@ const generateFallbackRooms = () => {
   const fallbackRooms = [];
   floors.forEach(f => {
     for (let i = 1; i <= 15; i++) {
-      const isCorner = i === 1 || i === 8 || i === 15;
+      const isCorner = i === 8 || i === 9 || i === 10;
       fallbackRooms.push({
         id: `${f.prefix}${i}`,
         floor: f.label,
@@ -121,10 +121,10 @@ const Rooms = () => {
       <div className="space-y-12">
         {filteredFloors.map(f => {
           const floorRooms = rooms
-            .filter(r => r.id && r.id.startsWith(f.prefix))
+            .filter(r => r?.id?.startsWith(f.prefix))
             .sort((a,b) => {
-              const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
-              const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
+              const numA = parseInt(a.id?.replace(/\D/g, '')) || 0;
+              const numB = parseInt(b.id?.replace(/\D/g, '')) || 0;
               return numA - numB;
             });
 
