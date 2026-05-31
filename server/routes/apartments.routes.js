@@ -106,6 +106,43 @@ router.get('/bookings', authenticateToken, authorizeRole(['SUPER_ADMIN', 'ADMIN'
   }
 });
 
+router.post('/bookings/:id/approve', authenticateToken, authorizeRole(['SUPER_ADMIN', 'ADMIN', 'APARTMENT_MANAGER']), async (req, res) => {
+  try {
+    const booking = await prisma.booking.findUnique({ where: { id: req.params.id } });
+    if (!booking) return res.status(404).json({ message: 'Booking not found.' });
+
+    await prisma.booking.update({
+      where: { id: req.params.id },
+      data: { status: 'APPROVED' }
+    });
+
+    const hashedPassword = await bcrypt.hash('tenant123', 10);
+    const user = await prisma.user.create({
+      data: {
+        email: booking.email,
+        name: booking.applicantName,
+        phone: booking.phone,
+        password: hashedPassword,
+        role: 'TENANT'
+      }
+    });
+
+    await prisma.tenantProfile.create({
+      data: { userId: user.id, unitId: booking.roomId }
+    });
+
+    await prisma.room.update({
+      where: { id: booking.roomId },
+      data: { status: 'OCCUPIED' }
+    });
+
+    res.json({ message: 'Booking approved successfully.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error approving booking.' });
+  }
+});
+
 router.get('/tenants', authenticateToken, authorizeRole(['SUPER_ADMIN', 'ADMIN', 'APARTMENT_MANAGER']), async (req, res) => {
   try {
     const tenants = await prisma.tenantProfile.findMany({
@@ -114,6 +151,59 @@ router.get('/tenants', authenticateToken, authorizeRole(['SUPER_ADMIN', 'ADMIN',
     res.json(tenants);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching tenants.' });
+  }
+});
+
+router.post('/tenants', authenticateToken, authorizeRole(['SUPER_ADMIN', 'ADMIN', 'APARTMENT_MANAGER']), async (req, res) => {
+  const { name, email, phone, roomId } = req.body;
+  try {
+    const room = await prisma.room.findUnique({ where: { id: roomId } });
+    if (!room || room.status === 'OCCUPIED') {
+      return res.status(400).json({ message: 'Room is not vacant or does not exist.' });
+    }
+
+    const hashedPassword = await bcrypt.hash('tenant123', 10);
+    const user = await prisma.user.create({
+      data: { email, name, phone, password: hashedPassword, role: 'TENANT' }
+    });
+
+    await prisma.tenantProfile.create({
+      data: { userId: user.id, unitId: roomId }
+    });
+
+    await prisma.room.update({
+      where: { id: roomId },
+      data: { status: 'OCCUPIED' }
+    });
+
+    res.status(201).json({ message: 'Tenant added successfully.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error adding tenant.' });
+  }
+});
+
+router.get('/announcements', authenticateToken, async (req, res) => {
+  try {
+    const announcements = await prisma.announcement.findMany({
+      include: { admin: { select: { name: true } } },
+      orderBy: { date: 'desc' }
+    });
+    res.json(announcements);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching announcements.' });
+  }
+});
+
+router.post('/announcements', authenticateToken, authorizeRole(['SUPER_ADMIN', 'ADMIN']), async (req, res) => {
+  const { title, content } = req.body;
+  try {
+    const announcement = await prisma.announcement.create({
+      data: { title, content, adminId: req.user.id }
+    });
+    res.status(201).json(announcement);
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating announcement.' });
   }
 });
 
