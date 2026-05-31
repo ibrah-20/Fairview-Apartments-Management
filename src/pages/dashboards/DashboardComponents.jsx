@@ -44,9 +44,9 @@ export const AdminTenants = () => {
   };
 
   const columns = [
-    { header: 'Name', accessor: 'user.name' },
-    { header: 'Email', accessor: 'user.email' },
-    { header: 'Phone', accessor: 'user.phone' },
+    { header: 'Name', render: (row) => row.user?.name || 'N/A' },
+    { header: 'Email', render: (row) => row.user?.email || 'N/A' },
+    { header: 'Phone', render: (row) => row.user?.phone || 'N/A' },
     { header: 'Room', accessor: 'unitId' }
   ];
 
